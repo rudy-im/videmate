@@ -1,9 +1,13 @@
 import cv2
 import mediapipe as mp
 
+print("Connecting to camera...")
+
 cap = cv2.VideoCapture(0)
 mp_face = mp.solutions.face_mesh
 face = mp_face.FaceMesh()
+
+print("Connected!")
 
 while cap.isOpened():
     ret, frame = cap.read()

@@ -1,6 +1,12 @@
 import cv2
 import mediapipe as mp
 
+
+index_to_hide = [i for i in range(100, 500)]
+
+
+
+
 print("Connecting to camera...")
 
 cap = cv2.VideoCapture(0)
@@ -24,8 +30,9 @@ while cap.isOpened():
         for i, landmark in enumerate(results.multi_face_landmarks[0].landmark):
             h, w, _ = frame.shape
             x, y = int(landmark.x * w), int(landmark.y * h)
-            #cv2.circle(frame, (x, y), 1, (0, 255, 0), -1)
-            cv2.putText(frame, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 255, 0), 1)
+
+            if i not in index_to_hide:
+                cv2.putText(frame, str(i), (x, y), cv2.FONT_HERSHEY_SIMPLEX, 0.2, (0, 255, 0), 1)
             
     cv2.imshow('Face Mesh', frame)
     

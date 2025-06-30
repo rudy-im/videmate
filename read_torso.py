@@ -1,7 +1,26 @@
 import cv2
 import mediapipe as mp
 
+import torso
+from database import DB
 
+
+print("Preparing database...")
+
+db = DB("data.db")
+
+for v in torso.dic.values():
+    db.drop_table(v)
+
+db.drop_table("frames")
+db.create_table("frames", ['frame_id INTEGER PRIMARY KEY',
+                           'time TEXT'])
+
+for v in torso.dic.values():
+    db.create_table(v, ['frame_id PRIMARY KEY',
+                        'x INTEGER NOT NULL',
+                        'y INTEGER NOT NULL',
+                        'FOREIGN KEY (frame_id) REFERENCES frames(frame_id)'])
 
 print("Connecting to camera...")
 
@@ -44,12 +63,18 @@ with mp_pose.Pose(
                 mp_drawing.DrawingSpec(color=(255, 0, 0), thickness=2)
             )
 
+            db.execute('INSERT INTO frames (time) VALUES (CURRENT_TIMESTAMP);')
+            frame_id = db.lastrowid()
+
             for idx, landmark in enumerate(results.pose_landmarks.landmark):
                 h, w, _ = frame.shape
                 x = int(landmark.x * w)
                 y = int(landmark.y * h)
                 cv2.putText(frame, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
+
+                if idx in torso.dic:
+                    db.insert(torso.dic[idx], (frame_id, x, y))
 
 
         cv2.imshow('Full Body Pose Tracking', frame)
@@ -62,6 +87,7 @@ with mp_pose.Pose(
 cap.release()
 cv2.destroyAllWindows()
 
+db.close()
 
 
 print("Camera released.")

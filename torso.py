@@ -1,5 +1,5 @@
 
-torso = {
+dic = {
     8: 'rCheek',
     6: 'rEyeOuter',
     5: 'rEyeCenter',

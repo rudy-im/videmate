@@ -6,7 +6,9 @@ class DB:
     def __init__(self, filename):
         self.filename = filename
         self.conn = sqlite3.connect(filename)
-        self.cursor = conn.cursor()
+        self.cursor = self.conn.cursor()
+
+        self.cursor.execute('PRAGMA foreign_keys = ON;')
 
 
     def drop_table(self, name):
@@ -53,18 +55,25 @@ class DB:
         sql = sql[:-2]
         sql += ') VALUES ('
 
-        for value in values:
-            sql += value + ', '
+        for i in range(len(values)):
+            sql += '?, '
 
         sql = sql[:-2]
         sql += ');'
 
-        self.cursor.execute(sql)
+        self.cursor.execute(sql, values)
         self.conn.commit()
 
 
     def close(self):
         self.conn.close()
+
+    def execute(self, sql):
+        self.cursor.execute(sql)
+        self.conn.commit()
+
+    def lastrowid(self):
+        return self.cursor.lastrowid
 
 
 

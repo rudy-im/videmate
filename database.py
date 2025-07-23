@@ -1,4 +1,5 @@
 import sqlite3
+import pandas as pd
 
 
 class DB:
@@ -17,11 +18,11 @@ class DB:
 
 
     # cols : ['col_name DATA_TYPE CONSTRAINTS', ... ]
-    def create_table(self, name, cols):
+    def create_table(self, tablename, cols):
         if len(cols)<=0:
             return
         
-        sql = 'CREATE TABLE ' + name + '('
+        sql = 'CREATE TABLE ' + tablename + '('
         
         for col in cols:
             sql += col + ', '
@@ -75,6 +76,25 @@ class DB:
     def lastrowid(self):
         return self.cursor.lastrowid
 
+    # cols : list of column names
+    def select(self, tablename, cols, start=0, end=0):
+        sql = 'SELECT '
+
+        for col in cols:
+            sql += col + ', '
+        
+        sql = sql[:-2]
+        sql += ' FROM ' + tablename
+
+        if(start!=0 or end!=0):
+            sql += 'WHERE '
+            if(start!=0): sql += 'frame_id > ' + start
+            if(start!=0 and end!=0): sql += ' AND '
+            if(end!=0): sql += 'frame_id < ' + end
+            
+        sql += ';'
+        
+        return pd.read_sql_query(sql, self.conn)
 
 
         

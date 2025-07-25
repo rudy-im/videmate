@@ -8,15 +8,16 @@ from scipy.signal import butter, filtfilt
 
 # 이동 평균 필터 (Moving Average)
 
-def movingAvg_filter (data, size=5):
+def movingavg (data, size=5):
     df = pd.Series(data)
     result = df.rolling(window=size, center=True).mean()
     return result.tolist()
 
 
+
 # 중앙값 필터 (Median Filter)
 
-def median_filter (data, size=5):
+def median (data, size=5):
     if size % 2 == 0:
         raise ValueError("Median filter size must be an odd integer.")
     return scipy_median(data, size=size)
@@ -25,7 +26,7 @@ def median_filter (data, size=5):
 
 # 저역통과 필터 (Low-pass filter)
 
-def lowpass_filter (data, cutoff=0.1, fs=1.0, order=2):
+def lowpass (data, cutoff=0.1, fs=1.0, order=2):
     if cutoff >= 0.5 * fs:
         raise ValueError("cutoff frequency must be less than Nyquist frequency (fs/2)")
     if len(data) < (order * 3):
@@ -33,6 +34,19 @@ def lowpass_filter (data, cutoff=0.1, fs=1.0, order=2):
         
     b, a = butter(order, cutoff / (0.5 * fs), btype='low')
     return filtfilt(b, a, data)
+
+
+
+# 변곡점 (Inflection Points)
+
+def find_inflection_points(y):
+    y = np.array(y)
+    dy = np.gradient(y)
+    ddy = np.gradient(dy)
+    inflection_points = np.where(np.diff(np.sign(ddy)))[0]
+    return inflection_points
+
+
 
 
 

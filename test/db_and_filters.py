@@ -9,4 +9,29 @@ import data_filter
 
 db = DB("../data.db")
 
-print(db.select('rWrist', ['x', 'y']))
+rWrist = db.select('rWrist', ['x', 'y'])
+
+rWristX = rWrist['x'].tolist()
+rWristX = rWrist['y'].tolist()
+
+rWristXMovingAvg = data_filter.movingavg(rWristX)
+rWristXMedian = data_filter.median(rWristX)
+rWristXLowPass = data_filter.lowpass(rWristX)
+
+rWristXMovingAvgIP = data_filter.find_inflection_points(rWristXMovingAvg)
+rWristXMedianIP = data_filter.find_inflection_points(rWristXMedian)
+rWristXLowPassIP = data_filter.find_inflection_points(rWristXLowPass)
+
+
+print(rWristXMovingAvg)
+print(rWristXMovingAvgIP)
+print('')
+
+print(rWristXMedian)
+print(rWristXMedianIP)
+print('')
+
+print(rWristXLowPass)
+print(rWristXLowPassIP)
+print('')
+

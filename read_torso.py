@@ -20,6 +20,7 @@ for v in torso.dic.values():
     db.create_table(v, ['frame_id PRIMARY KEY',
                         'x INTEGER NOT NULL',
                         'y INTEGER NOT NULL',
+                        'depth REAL NOT NULL',
                         'FOREIGN KEY (frame_id) REFERENCES frames(frame_id)'])
 
 print("Connecting to camera...")
@@ -70,11 +71,14 @@ with mp_pose.Pose(
                 h, w, _ = frame.shape
                 x = int(landmark.x * w)
                 y = int(landmark.y * h)
+                # z < 0 이면 카메라 쪽으로 튀어나온 것
+                # z > 0 이면 반대로 안쪽으로 들어간 것
+                depth = landmark.z
                 cv2.putText(frame, str(idx), (x, y), cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, (0, 0, 255), 1, cv2.LINE_AA)
 
                 if idx in torso.dic:
-                    db.insert(torso.dic[idx], (frame_id, x, y))
+                    db.insert(torso.dic[idx], (frame_id, x, y, depth))
 
 
         cv2.imshow('Full Body Pose Tracking', frame)
